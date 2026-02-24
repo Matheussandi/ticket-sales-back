@@ -91,3 +91,25 @@ partnerRouter.get("/events/:eventId", async (req, res) => {
 
   res.status(200).json(event);
 });
+
+partnerRouter.get("/dashboard", async (req, res) => {
+  const userId = req.user!.id;
+
+  if (req.user!.role !== 'partner') {
+    return res.status(403).json({ message: "Not authorized" });
+  }
+
+  try {
+    const partnerService = new PartnerService();
+    const partner = await partnerService.findByUserId(userId);
+
+    if (!partner) {
+      return res.status(403).json({ message: "Partner profile not found" });
+    }
+
+    const dashboard = await partnerService.getDashboard(partner.id);
+    res.status(200).json(dashboard);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});

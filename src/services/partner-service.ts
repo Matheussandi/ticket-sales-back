@@ -58,4 +58,31 @@ export class PartnerService {
   async findByUserId(userId: number) {
     return PartnerModel.findByUserId(userId);
   }
+
+  async getDashboard(partnerId: number) {
+    const db = Database.getInstance();
+    
+    const [rows] = await db.execute<any[]>(
+      `SELECT 
+         COUNT(DISTINCT e.id) as total_events,
+         COUNT(DISTINCT CASE 
+           WHEN MONTH(e.created_at) = MONTH(CURRENT_DATE()) 
+           AND YEAR(e.created_at) = YEAR(CURRENT_DATE()) 
+           THEN e.id 
+         END) as events_this_month,
+         COUNT(CASE WHEN t.status = 'sold' THEN 1 END) as tickets_sold,
+         COALESCE(SUM(CASE WHEN t.status = 'sold' THEN t.price END), 0) as total_revenue
+       FROM events e
+       LEFT JOIN tickets t ON t.event_id = e.id
+       WHERE e.partner_id = ?`,
+      [partnerId]
+    );
+
+    return {
+      totalEvents: rows[0].total_events,
+      eventsThisMonth: rows[0].events_this_month,
+      ticketsSold: rows[0].tickets_sold,
+      totalRevenue: parseFloat(rows[0].total_revenue)
+    };
+  }
 }

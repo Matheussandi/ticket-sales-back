@@ -9,8 +9,10 @@ import { UserService } from "../services/user-service.ts";
  * - Login de usuários
  * - Registro de novos clientes e parceiros
  * - Visualização pública de eventos
+ * - Rota raiz para healthcheck
  */
 export const unprotectedPaths = [
+  { method: "GET", path: "/" },
   { method: "POST", path: "/auth/login" },
   { method: "POST", path: "/customers/register" },
   { method: "POST", path: "/partners/register" },
