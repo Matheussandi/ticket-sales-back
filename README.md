@@ -68,7 +68,7 @@ vendas-ingresso/
 ### Eventos (`/events`)
 | Método | Rota | Descrição | Autenticação |
 |--------|------|-----------|--------------|
-| GET | `/events` | Listar todos os eventos | Não |
+| GET | `/events` | Listar todos os eventos (filtros opcionais: name, date, location) | Não |
 | GET | `/events/:eventId` | Detalhes de um evento | Não |
 | POST | `/events` | Criar evento | Sim |
 
