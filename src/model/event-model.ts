@@ -56,17 +56,34 @@ export class EventModel {
   }
 
   static async findAll(filter?: {
-    where?: { partner_id?: number };
+    where?: { partner_id?: number; name?: string; date?: string; location?: string };
   }): Promise<EventModel[]> {
     const db = Database.getInstance();
     let query = "SELECT * FROM events";
-    const params = [];
+    const params: any[] = [];
+    const conditions: string[] = [];
 
     if (filter && filter.where) {
       if (filter.where.partner_id) {
-        query += " WHERE partner_id = ?";
+        conditions.push("partner_id = ?");
         params.push(filter.where.partner_id);
       }
+      if (filter.where.name) {
+        conditions.push("name LIKE ?");
+        params.push(`%${filter.where.name}%`);
+      }
+      if (filter.where.date) {
+        conditions.push("DATE(date) = ?");
+        params.push(filter.where.date);
+      }
+      if (filter.where.location) {
+        conditions.push("location LIKE ?");
+        params.push(`%${filter.where.location}%`);
+      }
+    }
+
+    if (conditions.length > 0) {
+      query += " WHERE " + conditions.join(" AND ");
     }
 
     const [rows] = await db.execute<RowDataPacket[]>(query, params);

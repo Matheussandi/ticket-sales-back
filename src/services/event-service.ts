@@ -29,9 +29,18 @@ export class EventService {
     };
   }
 
-  async findAll(partnerId?: number) {
+  async findAll(filters?: { partnerId?: number; name?: string; date?: string; location?: string }) {
+    const where: any = {};
+    
+    if (filters) {
+      if (filters.partnerId) where.partner_id = filters.partnerId;
+      if (filters.name) where.name = filters.name;
+      if (filters.date) where.date = filters.date;
+      if (filters.location) where.location = filters.location;
+    }
+
     return await EventModel.findAll({
-      where: partnerId ? { partner_id: partnerId } : undefined,
+      where: Object.keys(where).length > 0 ? where : undefined,
     });
   }
 

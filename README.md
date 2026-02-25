@@ -51,14 +51,12 @@ vendas-ingresso/
 ### Autenticação (`/auth`)
 | Método | Rota | Descrição | Autenticação |
 |--------|------|-----------|--------------|
-| POST | `/auth/login` | Login de usuário | Não |
-
+| POST | `/auth/login` | Login de usuário | Não || PUT | `/auth/profile` | Edita dados do usuário logado | Sim |
 ### Parceiros (`/partners`)
 | Método | Rota | Descrição | Autenticação |
 |--------|------|-----------|--------------|
 | GET | `/partners` | Listar todos os parceiros | Sim |
-| POST | `/partners/register` | Registro de novo parceiro | Não |
-| POST | `/partners/events` | Criar evento | Sim |
+| POST | `/partners/register` | Registro de novo parceiro | Não || GET | `/partners/dashboard` | Dashboard com métricas do parceiro | Sim (Partner) || POST | `/partners/events` | Criar evento | Sim |
 | GET | `/partners/events` | Listar eventos do parceiro autenticado | Sim |
 | GET | `/partners/events/:eventId` | Detalhes de um evento específico | Sim |
 
@@ -70,7 +68,7 @@ vendas-ingresso/
 ### Eventos (`/events`)
 | Método | Rota | Descrição | Autenticação |
 |--------|------|-----------|--------------|
-| GET | `/events` | Listar todos os eventos | Não |
+| GET | `/events` | Listar todos os eventos (filtros opcionais: name, date, location) | Não |
 | GET | `/events/:eventId` | Detalhes de um evento | Não |
 | POST | `/events` | Criar evento | Sim |
 
@@ -84,9 +82,102 @@ vendas-ingresso/
 ### Compras (`/purchases`)
 | Método | Rota | Descrição | Autenticação |
 |--------|------|-----------|--------------|
-| POST | `/purchases` | Realizar compra de tickets | Sim (Cliente) |
+| POST | `/purchases` | Realizar compra de tickets | Sim (Cliente) || GET | `/purchases` | Listar compras do cliente logado | Sim (Cliente) |
+## � Detalhes dos Endpoints
 
-## 🛠️ Scripts Disponíveis
+### PUT `/auth/profile`
+Edita dados do usuário logado (name, email e/ou password).
+
+**Request:**
+```json
+{
+  "name": "Novo Nome",     // opcional
+  "email": "novo@email.com", // opcional
+  "password": "novasenha"   // opcional
+}
+```
+
+**Response (200):**
+```json
+{
+  "id": 1,
+  "name": "Novo Nome",
+  "email": "novo@email.com",
+  "role": "customer",
+  "created_at": "2024-01-15T10:30:00.000Z"
+}
+```
+
+**Erros:**
+- `400` - Nenhum campo fornecido ou email já em uso
+- `401` - Token inválido ou ausente
+- `500` - Erro interno do servidor
+
+### GET `/partners/dashboard`
+Dashboard com métricas do parceiro autenticado.
+
+**Response (200):**
+```json
+{
+  "totalEvents": 15,
+  "eventsThisMonth": 3,
+  "ticketsSold": 245,
+  "totalRevenue": 12450.50
+}
+```
+
+**Erros:**
+- `403` - Usuário não é parceiro ou perfil não encontrado
+- `401` - Token inválido ou ausente
+- `500` - Erro interno do servidor
+### GET `/purchases`
+Lista todas as compras do cliente logado com detalhes dos tickets e eventos.
+
+**Response (200):**
+```json
+[
+  {
+    "id": 1,
+    "purchase_date": "2024-01-15T10:30:00.000Z",
+    "total_amount": 450.00,
+    "status": "paid",
+    "tickets": [
+      {
+        "id": 10,
+        "location": "A1",
+        "price": 150.00,
+        "status": "sold",
+        "event": {
+          "id": 5,
+          "name": "Show de Rock",
+          "description": "Festival de rock",
+          "date": "2024-02-20T20:00:00.000Z",
+          "location": "Estádio Municipal"
+        }
+      },
+      {
+        "id": 11,
+        "location": "A2",
+        "price": 150.00,
+        "status": "sold",
+        "event": {
+          "id": 5,
+          "name": "Show de Rock",
+          "description": "Festival de rock",
+          "date": "2024-02-20T20:00:00.000Z",
+          "location": "Estádio Municipal"
+        }
+      }
+    ]
+  }
+]
+```
+
+**Erros:**
+- `403` - Usuário não é cliente ou perfil não encontrado
+- `401` - Token inválido ou ausente
+- `500` - Erro interno do servidor
+## �🛠️ Scripts Disponíveis
 
 ```bash
 npm run dev    # Desenvolvimento com hot-reload
