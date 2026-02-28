@@ -39,9 +39,15 @@ export const authMiddleware = async (
   next: NextFunction
 ) => {
   // Verifica se a rota está na lista de rotas não protegidas
-  const isUnprotectedRoute = unprotectedPaths.some(
-    (route) => route.method === req.method && req.path.startsWith(route.path)
-  );
+  const isUnprotectedRoute = unprotectedPaths.some((route) => {
+    if (route.method !== req.method) return false;
+    
+    // Comparação exata para path raiz
+    if (route.path === "/") return req.path === "/";
+    
+    // Para outros paths, permite subpaths
+    return req.path === route.path || req.path.startsWith(route.path + "/");
+  });
 
   // Se a rota for pública, pula a validação de autenticação
   if (isUnprotectedRoute) {
