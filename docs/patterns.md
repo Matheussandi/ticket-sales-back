@@ -180,7 +180,9 @@ POST /events/:eventId/tickets      # Criar tickets para evento
 ```json
 {
   "id": 1,
+  "name": "João Silva",
   "email": "user@example.com",
+  "role": "customer",
   "iat": 1234567890,
   "exp": 1234571490
 }

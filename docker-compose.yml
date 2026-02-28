@@ -12,6 +12,10 @@ services:
       PORT: ${PORT:-3000}
       JWT_SECRET: ${JWT_SECRET:-your_secret_key}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./package.json:/usr/src/app/package.json
+      - ./tsconfig.json:/usr/src/app/tsconfig.json
     depends_on:
       mysql:
         condition: service_healthy
