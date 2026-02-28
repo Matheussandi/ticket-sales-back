@@ -91,7 +91,7 @@ try {
 ## Autenticação
 
 - **JWT** no header `Authorization: Bearer <token>`
-- Token contém: `{ id, email }`
+- Token contém: `{ id, name, email, role }`
 - Expiração: 1 hora
 - Rotas públicas definidas em `app.ts` no array `unprotectedPaths`
 

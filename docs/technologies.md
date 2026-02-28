@@ -52,7 +52,7 @@ Este documento descreve todas as tecnologias, bibliotecas e ferramentas utilizad
 - **Uso no projeto**:
   - Geração de tokens após login
   - Validação de tokens em rotas protegidas
-  - Payload com `id` e `email` do usuário
+  - Payload com `id`, `name`, `email` e `role` do usuário
 
 ### bcrypt
 - **Descrição**: Biblioteca para hash de senhas

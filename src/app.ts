@@ -33,18 +33,6 @@ const PORT = process.env.PORT || 3000;
 
 export default app;
 
-app.listen(PORT, async () => {
-  const connection = Database.getInstance();
-
-  await connection.execute("SET FOREIGN_KEY_CHECKS = 0");
-  await connection.execute("TRUNCATE TABLE reservation_tickets");
-   await connection.execute("TRUNCATE TABLE purchase_tickets");
-  await connection.execute("TRUNCATE TABLE purchases");
-  await connection.execute("TRUNCATE TABLE tickets");
-  await connection.execute("TRUNCATE TABLE users");
-  await connection.execute("TRUNCATE TABLE partners");
-  await connection.execute("TRUNCATE TABLE customers");
-  await connection.execute("TRUNCATE TABLE events");
-  await connection.execute("SET FOREIGN_KEY_CHECKS = 1");
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
