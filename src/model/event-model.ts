@@ -56,7 +56,7 @@ export class EventModel {
   }
 
   static async findAll(filter?: {
-    where?: { partner_id?: number; name?: string; date?: string; location?: string };
+    where?: { id?: number; partner_id?: number; name?: string; date?: string; location?: string };
   }): Promise<EventModel[]> {
     const db = Database.getInstance();
     let query = "SELECT * FROM events";
@@ -64,6 +64,10 @@ export class EventModel {
     const conditions: string[] = [];
 
     if (filter && filter.where) {
+      if (filter.where.id) {
+        conditions.push("id = ?");
+        params.push(filter.where.id);
+      }
       if (filter.where.partner_id) {
         conditions.push("partner_id = ?");
         params.push(filter.where.partner_id);
