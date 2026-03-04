@@ -33,10 +33,11 @@ eventsRouter.post("/", async (req, res) => {
 });
 
 eventsRouter.get("/", async (req, res) => {
-  const { name, date, location } = req.query;
+  const { id, name, date, location } = req.query;
   
   const eventService = new EventService();
   const result = await eventService.findAll({
+    id: id ? Number(id) : undefined,
     name: name as string | undefined,
     date: date as string | undefined,
     location: location as string | undefined,
