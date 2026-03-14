@@ -159,7 +159,7 @@ export class TicketModel {
     if (data.id !== undefined) this.id = data.id;
     if (data.location !== undefined) this.location = data.location;
     if (data.event_id !== undefined) this.event_id = data.event_id;
-    if (data.price !== undefined) this.price = data.price;
+    if (data.price !== undefined) this.price = Number(data.price);
     if (data.status !== undefined) this.status = data.status;
     if (data.created_at !== undefined) this.created_at = data.created_at;
   }
