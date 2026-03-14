@@ -1,0 +1,46 @@
+---
+description: Visao geral do projeto ticket-sales-back
+alwaysApply: true
+---
+
+# Projeto: API de Venda de Ingressos
+
+## Stack
+
+- Node.js 22+ com TypeScript 5.9+ (execucao direta via `--experimental-strip-types`, sem build)
+- Express 5 (framework HTTP)
+- MySQL 8 com mysql2/promise (queries diretas, sem ORM)
+- JWT (jsonwebtoken) + bcrypt para autenticacao
+
+## Arquitetura
+
+```
+Request -> Middlewares (CORS, Auth JWT) -> Controller -> Service -> Model -> Database (pool MySQL Singleton)
+```
+
+- **Controller** (`src/controller/`): recebe HTTP, delega para Service, retorna resposta JSON
+- **Service** (`src/services/`): regras de negocio, transacoes, orquestracao entre Models
+- **Model** (`src/model/`): padrao Active Record, CRUD com SQL direto
+- **Database** (`src/database.ts`): Singleton com pool de conexoes
+
+## Convencoes
+
+- Arquivos: kebab-case (`purchase-service.ts`)
+- Classes: PascalCase (`PurchaseService`)
+- Tabelas/colunas BD: snake_case (`created_at`)
+- Imports com extensao `.ts`
+
+## Autenticacao
+
+- JWT com payload: `{ id, name, email, role }`, expiracao 1h
+- Roles: `customer` | `partner`
+- Middleware em `src/middlewares/auth-middleware.ts` popula `req.user`
+
+## Documentacao detalhada
+
+Antes de fazer alteracoes significativas, consulte os docs relevantes:
+
+- `docs/architecture.md` - Camadas, fluxo de dados, diagrama de entidades, autenticacao, transacoes
+- `docs/patterns.md` - Active Record, Singleton, DI, convencoes de codigo, tratamento de erros, seguranca
+- `docs/technologies.md` - Stack completa, versoes, dependencias
+- `docs/system-requirements.md` - Regras de negocio, requisitos funcionais/nao-funcionais, fluxos de compra/cancelamento

@@ -1,4 +1,12 @@
 import { UserModel } from "../model/user-model.ts";
+import { CustomerModel } from "../model/customer-model.ts";
+
+export class InvalidPasswordError extends Error {
+  constructor() {
+    super("Current password is incorrect");
+    this.name = "InvalidPasswordError";
+  }
+}
 
 export class UserService {
   async findById(userId: number) {
@@ -9,15 +17,21 @@ export class UserService {
     return UserModel.findByEmail(email);
   }
 
-  async updateProfile(userId: number, data: { name?: string; email?: string; password?: string }) {
-    const { name, email, password } = data;
+  async updateProfile(
+    userId: number,
+    role: "customer" | "partner",
+    data: { name?: string; email?: string; phone?: string },
+  ) {
+    const { name, email, phone } = data;
 
-    // Validar que ao menos um campo foi fornecido
-    if (!name && !email && !password) {
+    if (!name && !email && !phone) {
       throw new Error("At least one field must be provided");
     }
 
-    // Se email for fornecido, verificar unicidade
+    if (phone && role !== "customer") {
+      throw new Error("Phone update is only available for customers");
+    }
+
     if (email) {
       const existingUser = await UserModel.findByEmail(email);
       if (existingUser && existingUser.id !== userId) {
@@ -25,28 +39,43 @@ export class UserService {
       }
     }
 
-    // Buscar usuário atual
     const user = await UserModel.findById(userId);
     if (!user) {
       throw new Error("User not found");
     }
 
-    // Atualizar campos fornecidos
-    if (name) {
-      user.name = name;
-    }
-    if (email) {
-      user.email = email;
-    }
-    if (password) {
-      user.password = await UserModel.hashPassword(password);
-    }
+    if (name) user.name = name;
+    if (email) user.email = email;
 
-    // Salvar alterações
     await user.update();
 
-    // Retornar usuário sem senha
+    let updatedPhone: string | undefined;
+
+    if (phone && role === "customer") {
+      const customer = await CustomerModel.findByUserId(userId);
+      if (!customer) {
+        throw new Error("Customer not found");
+      }
+      customer.phone = phone;
+      await customer.update();
+      updatedPhone = customer.phone;
+    }
+
     const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return { ...userWithoutPassword, ...(updatedPhone !== undefined && { phone: updatedPhone }) };
+  }
+
+  async changePassword(userId: number, currentPassword: string, newPassword: string): Promise<void> {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (!UserModel.comparePassword(currentPassword, user.password!)) {
+      throw new InvalidPasswordError();
+    }
+
+    user.password = UserModel.hashPassword(newPassword);
+    await user.update();
   }
 }

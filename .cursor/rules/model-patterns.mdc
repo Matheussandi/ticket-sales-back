@@ -1,0 +1,36 @@
+---
+description: Padrao Active Record dos Models
+globs: src/model/*.ts
+alwaysApply: false
+---
+
+# Model Layer - Padrao Active Record
+
+Cada Model representa uma tabela do banco. Nao usamos ORM; queries SQL sao escritas diretamente com mysql2.
+
+## Estrutura obrigatoria
+
+- **Metodos estaticos**: `create`, `findById`, `findAll`, opcionais `findByX` (ex: `findByUserId`, `findByEmail`)
+- **Metodo `fill(data)`**: popula a instancia a partir de um resultado de query
+- **Metodos de instancia**: `update`, `delete`
+- Opcao `{ connection }` nos metodos para uso em transacoes
+- Opcao `{ user: true }` em `findById`/`findAll` para JOINs com a tabela `users`
+
+## Enums de status
+
+Definidos como objetos `as const` com tipo derivado:
+
+```typescript
+export const TicketStatus = { AVAILABLE: "available", RESERVED: "reserved", SOLD: "sold" } as const;
+export type TicketStatus = typeof TicketStatus[keyof typeof TicketStatus];
+```
+
+## Regras
+
+- Sempre usar queries parametrizadas com `?` (nunca interpolacao de strings)
+- Insercoes em lote: construir query unica com `VALUES (?, ?), (?, ?)...`
+- Pool obtido via `Database.getInstance()`
+
+## Referencia
+
+Para detalhes do padrao Active Record, exemplos de queries e seguranca SQL, consulte `docs/patterns.md` secoes "Active Record" e "Padroes de Banco de Dados".

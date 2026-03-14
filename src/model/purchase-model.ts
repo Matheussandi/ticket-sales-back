@@ -128,7 +128,7 @@ export class PurchaseModel {
     if (data.id !== undefined) this.id = data.id;
     if (data.customer_id !== undefined) this.customer_id = data.customer_id;
     if (data.purchase_date !== undefined) this.purchase_date = data.purchase_date;
-    if (data.total_amount !== undefined) this.total_amount = data.total_amount;
+    if (data.total_amount !== undefined) this.total_amount = Number(data.total_amount);
     if (data.status !== undefined) this.status = data.status;
   }
 }

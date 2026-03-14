@@ -78,6 +78,11 @@ export class PurchaseService {
       purchase.status = PurchaseStatus.PAID;
       await purchase.update({ connection });
 
+      for (const ticket of tikects) {
+        ticket.status = TicketStatus.SOLD;
+        await ticket.update({ connection });
+      }
+
       await ReservationTicketModel.create(
         {
           customer_id: data.customerId,
