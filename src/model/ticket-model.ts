@@ -133,8 +133,8 @@ export class TicketModel {
     return rows.map((row) => new TicketModel(row as TicketModel));
   }
 
-  async update(): Promise<void> {
-    const db = Database.getInstance();
+  async update(options?: { connection?: PoolConnection }): Promise<void> {
+    const db = options?.connection ?? Database.getInstance();
     const [result] = await db.execute<ResultSetHeader>(
       "UPDATE tickets SET location = ?, event_id = ?, price = ?, status = ? WHERE id = ?",
       [this.location, this.event_id, this.price, this.status, this.id],
