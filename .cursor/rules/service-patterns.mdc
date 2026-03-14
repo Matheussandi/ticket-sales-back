@@ -1,0 +1,42 @@
+---
+description: Padroes da camada de Service
+globs: src/services/*.ts
+alwaysApply: false
+---
+
+# Service Layer
+
+Toda regra de negocio vive nos Services. Controllers nunca contem logica de negocio.
+
+## Transacoes
+
+Operacoes que envolvem multiplas tabelas usam transacao explicita:
+
+```typescript
+const connection = await db.getConnection();
+try {
+  await connection.beginTransaction();
+  await Model.create(data, { connection });
+  await connection.commit();
+} catch (error) {
+  await connection.rollback();
+  throw error;
+} finally {
+  connection.release();
+}
+```
+
+Sempre passar `{ connection }` para os Models dentro de transacoes.
+
+## Injecao de dependencia
+
+Manual via construtor. Exemplo: `PurchaseService` recebe `PaymentService` no construtor.
+
+## Erros customizados
+
+Classes que estendem `Error` para erros de negocio (ex: `InvalidCredentialsError`). Controllers fazem `instanceof` para retornar o status HTTP correto.
+
+## Referencias
+
+- Para detalhes de transacoes, DI e tratamento de erros: `docs/patterns.md` secoes "Service Layer", "Gestao de Transacoes" e "Padroes de Erro"
+- Para fluxos de negocio completos (compra, cancelamento, registro): `docs/system-requirements.md`

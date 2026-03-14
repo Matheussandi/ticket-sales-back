@@ -1,0 +1,42 @@
+---
+description: Padroes dos Controllers e rotas REST
+globs: src/controller/*.ts
+alwaysApply: false
+---
+
+# Controller Layer
+
+Controllers recebem requisicoes HTTP, delegam para Services e retornam respostas JSON.
+
+## Estrutura
+
+- Cada controller exporta um `Router` do Express 5
+- Routers sao montados em `src/app.ts` via `app.use(prefixo, router)`
+
+## Rotas REST
+
+- Listar: `GET /{recursos}`
+- Obter: `GET /{recursos}/:id`
+- Criar: `POST /{recursos}`
+- Atualizar: `PUT /{recursos}/:id`
+- Recursos aninhados: `GET /events/:eventId/tickets`
+
+## Autenticacao
+
+- `req.user` populado pelo middleware JWT (campos: `id`, `name`, `email`, `role`)
+- Checagem de role feita no controller: `req.user.role === 'partner'`
+- Rotas publicas: login, registro de customer/partner, listagem de eventos
+
+## Respostas padronizadas
+
+- Sucesso: `res.status(200).json(data)` ou `res.status(201).json(data)`
+- Erro de negocio: `res.status(400).json({ error: "mensagem" })`
+- Nao autorizado: `res.status(401).json({ error: "mensagem" })`
+- Proibido: `res.status(403).json({ message: "Not authorized" })`
+- Nao encontrado: `res.status(404).json({ error: "mensagem" })`
+- Erro interno: `res.status(500).json({ message: "Internal server error" })`
+
+## Referencias
+
+- Para detalhes de autenticacao e rotas protegidas: `docs/architecture.md` secao "Autenticacao e Autorizacao"
+- Para convencoes REST e respostas de erro: `docs/patterns.md` secoes "Rotas REST" e "Respostas de Erro Padronizadas"
