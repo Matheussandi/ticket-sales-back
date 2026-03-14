@@ -6,6 +6,7 @@ import { partnerRouter } from "./controller/partner-controller.ts";
 import { eventsRouter } from "./controller/events-controller.ts";
 import { ticketRoutes } from "./controller/ticket-contoller.ts";
 import { authRouter } from "./controller/auth-controller.ts";
+import { profileRouter } from "./controller/profile-controller.ts";
 
 import { corsMiddleware } from "./middlewares/cors-middleware.ts";
 import { authMiddleware } from "./middlewares/auth-middleware.ts";
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/profile", profileRouter);
 app.use("/customers", customerRouter);
 app.use("/partners", partnerRouter);
 app.use("/events", eventsRouter);
