@@ -32,9 +32,9 @@ Request -> Middlewares (CORS, Auth JWT) -> Controller -> Service -> Model -> Dat
 
 ## Autenticacao
 
-- JWT com payload: `{ id, name, email, role }`, expiracao 1h
+- JWT com payload: `{ id, name, email, role }`, expiracao 1h; enviado ao browser em cookie httpOnly no login
 - Roles: `customer` | `partner`
-- Middleware em `src/middlewares/auth-middleware.ts` popula `req.user`
+- Middleware em `src/middlewares/auth-middleware.ts` popula `req.user` (token via cookie ou header Bearer opcional)
 
 ## Documentacao detalhada
 

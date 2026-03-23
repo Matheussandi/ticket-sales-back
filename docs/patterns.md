@@ -191,7 +191,12 @@ POST /events/:eventId/tickets      # Criar tickets para evento
 **Configuração**:
 - Algoritmo: HS256 (default)
 - Expiração: 1 hora
-- Secret: Configurado via ambiente (atual: hardcoded para desenvolvimento)
+- Secret: `JWT_SECRET` (variável de ambiente)
+
+**Entrega ao cliente**:
+- **Navegador**: cookie **httpOnly** no login (`res.cookie`), nome configurável (`JWT_COOKIE_NAME`, padrão `access_token`), com `sameSite` e `secure` via `COOKIE_SAME_SITE` e `COOKIE_SECURE` (ver `.env.example`).
+- **Corpo da resposta**: após login, retorna apenas `{ user }`, sem o JWT no JSON.
+- **Ferramentas / testes**: o middleware aceita também `Authorization: Bearer <jwt>`.
 
 ### Middleware de Autenticação
 
@@ -199,15 +204,16 @@ POST /events/:eventId/tickets      # Criar tickets para evento
 // Rotas públicas definidas explicitamente
 const unprotectedPaths = [
   { method: "POST", path: "/auth/login" },
+  { method: "POST", path: "/auth/logout" },
   { method: "POST", path: "/customers/register" },
   // ...
 ];
 
-// Middleware verifica se rota precisa de auth
+// cookie-parser antes do middleware; token = cookie[JWT_COOKIE_NAME] || Bearer
 app.use(async (req, res, next) => {
   if (isUnprotectedRoute) return next();
   // Valida token...
-  req.user = user;  // Anexa usuário ao request
+  req.user = user;
   next();
 });
 ```

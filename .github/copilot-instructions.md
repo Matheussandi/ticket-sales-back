@@ -90,10 +90,10 @@ try {
 
 ## Autenticação
 
-- **JWT** no header `Authorization: Bearer <token>`
+- **JWT** em cookie **httpOnly** após `POST /auth/login` (nome em `JWT_COOKIE_NAME`); fallback `Authorization: Bearer <token>` para testes
 - Token contém: `{ id, name, email, role }`
 - Expiração: 1 hora
-- Rotas públicas definidas em `app.ts` no array `unprotectedPaths`
+- Rotas públicas definidas em `src/middlewares/auth-middleware.ts` no array `unprotectedPaths`
 
 ## Entidades do Sistema
 
@@ -122,12 +122,14 @@ try {
 
 ### Rotas Públicas (sem autenticação)
 - `POST /auth/login`
+- `POST /auth/logout`
 - `POST /customers/register`
 - `POST /partners/register`
 - `GET /events`
 - `GET /events/:eventId`
 
-### Rotas Protegidas (requer JWT)
+### Rotas Protegidas (requer JWT no cookie ou Bearer)
+- `GET /auth/me`
 - `GET /partners`
 - `POST /partners/events`
 - `GET /partners/events`
@@ -144,7 +146,7 @@ try {
 - **Linguagem**: TypeScript 5.9+
 - **Framework**: Express 5.2+
 - **Banco de Dados**: MySQL 8.x via mysql2/promise
-- **Autenticação**: JWT (jsonwebtoken)
+- **Autenticação**: JWT (jsonwebtoken) + cookie-parser (cookie httpOnly)
 - **Criptografia**: bcrypt (10 rounds)
 - **Containerização**: Docker + Docker Compose
 

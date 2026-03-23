@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 
 import { purchaseRouter } from "./controller/purchase-controller.ts";
 import { customerRouter } from "./controller/customer-controller.ts";
@@ -16,6 +17,7 @@ import { Database } from "./database.ts";
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(corsMiddleware());
 app.use(authMiddleware);
 

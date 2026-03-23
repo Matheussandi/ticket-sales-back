@@ -23,6 +23,7 @@ Este documento descreve todas as tecnologias, bibliotecas e ferramentas utilizad
   - Roteamento de requisições HTTP
   - Middleware de autenticação
   - Parsing de JSON
+  - Cookies de sessão (`res.cookie` / `res.clearCookie`)
 - **Documentação**: https://expressjs.com/
 
 ## Banco de Dados
@@ -51,8 +52,14 @@ Este documento descreve todas as tecnologias, bibliotecas e ferramentas utilizad
 - **Por que usamos**: Autenticação stateless, escalabilidade
 - **Uso no projeto**:
   - Geração de tokens após login
-  - Validação de tokens em rotas protegidas
+  - Armazenamento no cliente via cookie **httpOnly** (não exposto ao JavaScript da página)
+  - Validação a partir do cookie ou do header `Authorization` (fallback)
   - Payload com `id`, `name`, `email` e `role` do usuário
+
+### cookie-parser
+- **Pacote**: `cookie-parser`
+- **Descrição**: Popula `req.cookies` a partir do header `Cookie`
+- **Uso no projeto**: Leitura do JWT enviado em cookie no middleware de autenticação
 
 ### bcrypt
 - **Descrição**: Biblioteca para hash de senhas
@@ -98,7 +105,9 @@ Este documento descreve todas as tecnologias, bibliotecas e ferramentas utilizad
   "express": "^5.2+",
   "mysql2": "^3.16+",
   "jsonwebtoken": "^9.x",
-  "bcrypt": "^5.x"
+  "bcrypt": "^6.x",
+  "cookie-parser": "^1.4.x",
+  "cors": "^2.8.x"
 }
 ```
 
@@ -107,7 +116,9 @@ Este documento descreve todas as tecnologias, bibliotecas e ferramentas utilizad
 {
   "@types/express": "^5.x",
   "@types/jsonwebtoken": "^9.x",
-  "@types/bcrypt": "^5.x",
+  "@types/bcrypt": "^6.x",
+  "@types/cookie-parser": "^1.4.x",
+  "@types/cors": "^2.8.x",
   "@types/node": "^22.x",
   "typescript": "^5.9+"
 }

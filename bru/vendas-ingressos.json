@@ -49,13 +49,43 @@
               "multipartForm": [],
               "file": []
             },
-            "script": {
-              "res": "const bearer = \"\";\nbru.setEnvVar(\"accessToken\", bearer.concat(res.body.token));"
-            },
+            "script": {},
             "vars": {},
             "assertions": [],
             "tests": "",
             "docs": "",
+            "auth": {
+              "mode": "inherit"
+            }
+          }
+        },
+        {
+          "type": "http",
+          "name": "Me",
+          "filename": "Me.bru",
+          "seq": 2,
+          "settings": {
+            "encodeUrl": true,
+            "timeout": 0
+          },
+          "tags": [],
+          "examples": [],
+          "request": {
+            "url": "{{baseURL}}/auth/me",
+            "method": "GET",
+            "headers": [],
+            "params": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": [],
+              "file": []
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "docs": "Chame após Login para validar sessão (cookie).",
             "auth": {
               "mode": "inherit"
             }
@@ -116,10 +146,7 @@
             "tests": "",
             "docs": "",
             "auth": {
-              "mode": "bearer",
-              "bearer": {
-                "token": "{{accessToken}}"
-              }
+              "mode": "inherit"
             }
           }
         },
@@ -151,10 +178,7 @@
             "tests": "",
             "docs": "",
             "auth": {
-              "mode": "bearer",
-              "bearer": {
-                "token": "{{accessToken}}"
-              }
+              "mode": "inherit"
             }
           }
         },
@@ -316,10 +340,7 @@
             "tests": "",
             "docs": "",
             "auth": {
-              "mode": "bearer",
-              "bearer": {
-                "token": "{{accessToken}}"
-              }
+              "mode": "inherit"
             }
           }
         },
@@ -396,10 +417,7 @@
             "tests": "",
             "docs": "",
             "auth": {
-              "mode": "bearer",
-              "bearer": {
-                "token": "{{accessToken}}"
-              }
+              "mode": "inherit"
             }
           }
         },
@@ -437,10 +455,7 @@
             "tests": "",
             "docs": "",
             "auth": {
-              "mode": "bearer",
-              "bearer": {
-                "token": "{{accessToken}}"
-              }
+              "mode": "inherit"
             }
           }
         },
@@ -524,10 +539,7 @@
             "tests": "",
             "docs": "",
             "auth": {
-              "mode": "bearer",
-              "bearer": {
-                "token": "{{accessToken}}"
-              }
+              "mode": "inherit"
             }
           }
         }
@@ -586,10 +598,7 @@
             "tests": "",
             "docs": "",
             "auth": {
-              "mode": "bearer",
-              "bearer": {
-                "token": "{{accessToken}}"
-              }
+              "mode": "inherit"
             }
           }
         }
@@ -655,10 +664,7 @@
             "tests": "",
             "docs": "",
             "auth": {
-              "mode": "bearer",
-              "bearer": {
-                "token": "{{accessToken}}"
-              }
+              "mode": "inherit"
             }
           }
         },
@@ -703,10 +709,7 @@
             "tests": "",
             "docs": "",
             "auth": {
-              "mode": "bearer",
-              "bearer": {
-                "token": "{{accessToken}}"
-              }
+              "mode": "inherit"
             }
           }
         }
@@ -722,13 +725,6 @@
           "value": "http://localhost:8080",
           "enabled": true,
           "secret": false,
-          "type": "text"
-        },
-        {
-          "name": "accessToken",
-          "value": "",
-          "enabled": true,
-          "secret": true,
           "type": "text"
         }
       ],

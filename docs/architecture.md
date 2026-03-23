@@ -16,8 +16,8 @@ O projeto segue uma arquitetura em camadas baseada no padrão **MVC (Model-View-
 │                      Express App (app.ts)                    │
 │  ┌─────────────────────────────────────────────────────────┐ │
 │  │                    Middlewares                           │ │
-│  │  • JSON Parser                                          │ │
-│  │  • Autenticação JWT                                     │ │
+│  │  • JSON Parser + cookie-parser                          │ │
+│  │  • CORS + Autenticação JWT (cookie httpOnly / Bearer)   │ │
 │  └─────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
                               │
@@ -228,28 +228,41 @@ O projeto segue uma arquitetura em camadas baseada no padrão **MVC (Model-View-
    - Gera token JWT
          │
          ▼
-3. Retorna { token: "jwt..." }
+3. AuthController define Set-Cookie (httpOnly, path, sameSite, secure)
+   e responde JSON { user: { id, name, email, role } } (sem token no corpo)
 ```
+
+O cliente web deve enviar requisições com **credenciais** (`credentials: 'include'` em `fetch`) para o navegador anexar o cookie. O **CORS** usa `credentials: true` e `CORS_ORIGIN` deve ser a origem exata do front (sem wildcard).
 
 ### Middleware de Autorização
 
 ```
-Requisição com header Authorization: Bearer <token>
+Requisição à rota protegida
          │
          ▼
-Middleware em app.ts
+Middleware (após cookie-parser)
    - Verifica se rota é protegida
-   - Extrai e valida token JWT
-   - Busca usuário no banco
+   - Obtém JWT: cookie httpOnly (nome em JWT_COOKIE_NAME) ou,
+     para ferramentas, header Authorization: Bearer <token>
+   - Valida JWT e busca usuário no banco
    - Anexa user ao request
          │
          ▼
 Controller recebe req.user
 ```
 
+### Logout
+
+`POST /auth/logout` é rota pública: remove o cookie com as mesmas opções de `path` / `sameSite` / `secure` usadas no login (evita sessão “presa” quando o JWT já expirou).
+
+### Sessão atual
+
+`GET /auth/me` (rota protegida) retorna `{ user: { id, name, email, role } }` com base em `req.user` após validação do JWT — útil para hidratar o front após reload ou validar cookie.
+
 ### Rotas Não Protegidas
 
 - `POST /auth/login`
+- `POST /auth/logout`
 - `POST /customers/register`
 - `POST /partners/register`
 - `GET /events` e `GET /events/:eventId`
