@@ -17,10 +17,15 @@ npm install
 # Configurar variáveis de ambiente
 cp .env.example .env
 
-# Iniciar banco de dados com Docker
-docker-compose up -d
+# Subir MySQL + API no Docker (API em http://localhost:8080 → container porta 3000)
+docker compose up -d
 
-# Executar em modo de desenvolvimento
+# Só o banco (API local com npm run dev): docker compose up -d mysql
+
+# Se alterar dependências em package.json / package-lock.json, reconstrua a imagem Node:
+# docker compose build node && docker compose up -d
+
+# Executar API em modo desenvolvimento no host (usa .env local)
 npm run dev
 ```
 
@@ -34,6 +39,7 @@ vendas-ingresso/
 │   ├── controller/         # Controladores das rotas HTTP
 │   ├── model/              # Modelos de dados (Active Record)
 │   ├── services/           # Serviços com regras de negócio
+│   ├── config/             # Configurações compartilhadas (ex.: cookie de auth)
 │   └── types/              # Definições de tipos TypeScript
 ├── docs/                   # Documentação detalhada
 │   ├── system-requirements.md  # Requisitos do sistema
@@ -41,7 +47,7 @@ vendas-ingresso/
 │   ├── architecture.md     # Arquitetura do projeto
 │   └── patterns.md         # Padrões de projeto
 ├── bru/                    # Coleção de requisições HTTP (Bruno)
-├── docker-compose.yml      # Configuração do MySQL
+├── docker-compose.yml      # MySQL + serviço Node (API)
 ├── init.sql                # Script de inicialização do banco
 └── package.json            # Dependências e scripts
 ```
@@ -49,14 +55,29 @@ vendas-ingresso/
 ## 🔑 Endpoints da API
 
 ### Autenticação (`/auth`)
+
+O JWT é enviado ao navegador em cookie **httpOnly** (`JWT_COOKIE_NAME`, padrão `access_token`). O front deve usar requisições com **credenciais** (`credentials: 'include'` em `fetch`). O middleware também aceita `Authorization: Bearer` para testes (Bruno, curl, etc.).
+
 | Método | Rota | Descrição | Autenticação |
 |--------|------|-----------|--------------|
-| POST | `/auth/login` | Login de usuário | Não || PUT | `/auth/profile` | Edita dados do usuário logado | Sim |
+| POST | `/auth/login` | Login; responde `{ user }` e define cookie httpOnly com o JWT | Não |
+| POST | `/auth/logout` | Encerra sessão no servidor (`clearCookie`) | Não |
+| GET | `/auth/me` | Dados do usuário da sessão atual (`{ user }`, mesmo formato do login) | Sim |
+
+### Perfil (`/profile`)
+
+| Método | Rota | Descrição | Autenticação |
+|--------|------|-----------|--------------|
+| PUT | `/profile` | Edita dados do usuário logado (name, email, password) | Sim |
+| PUT | `/profile/password` | Altera apenas a senha | Sim |
+
 ### Parceiros (`/partners`)
 | Método | Rota | Descrição | Autenticação |
 |--------|------|-----------|--------------|
 | GET | `/partners` | Listar todos os parceiros | Sim |
-| POST | `/partners/register` | Registro de novo parceiro | Não || GET | `/partners/dashboard` | Dashboard com métricas do parceiro | Sim (Partner) || POST | `/partners/events` | Criar evento | Sim |
+| POST | `/partners/register` | Registro de novo parceiro | Não |
+| GET | `/partners/dashboard` | Dashboard com métricas do parceiro | Sim (Partner) |
+| POST | `/partners/events` | Criar evento | Sim |
 | GET | `/partners/events` | Listar eventos do parceiro autenticado | Sim |
 | GET | `/partners/events/:eventId` | Detalhes de um evento específico | Sim |
 
@@ -82,10 +103,16 @@ vendas-ingresso/
 ### Compras (`/purchases`)
 | Método | Rota | Descrição | Autenticação |
 |--------|------|-----------|--------------|
-| POST | `/purchases` | Realizar compra de tickets | Sim (Cliente) || GET | `/purchases` | Listar compras do cliente logado | Sim (Cliente) |
-## � Detalhes dos Endpoints
+| POST | `/purchases` | Realizar compra de tickets | Sim (Cliente) |
+| GET | `/purchases` | Listar compras do cliente logado | Sim (Cliente) |
 
-### PUT `/auth/profile`
+## Variáveis de ambiente relevantes à auth
+
+Além de `JWT_SECRET`, configure `CORS_ORIGIN` com a **origem exata** do front (com `credentials: true` não use `*`). Para cookie em origens cruzadas (ex.: front em outra porta), use `COOKIE_SAME_SITE=none` e `COOKIE_SECURE=true` (HTTPS). Veja comentários em [`.env.example`](.env.example).
+
+## Detalhes dos Endpoints
+
+### PUT `/profile`
 Edita dados do usuário logado (name, email e/ou password).
 
 **Request:**
@@ -110,7 +137,7 @@ Edita dados do usuário logado (name, email e/ou password).
 
 **Erros:**
 - `400` - Nenhum campo fornecido ou email já em uso
-- `401` - Token inválido ou ausente
+- `401` - Sessão inválida ou ausente (cookie ou Bearer)
 - `500` - Erro interno do servidor
 
 ### GET `/partners/dashboard`
@@ -128,7 +155,7 @@ Dashboard com métricas do parceiro autenticado.
 
 **Erros:**
 - `403` - Usuário não é parceiro ou perfil não encontrado
-- `401` - Token inválido ou ausente
+- `401` - Sessão inválida ou ausente (cookie ou Bearer)
 - `500` - Erro interno do servidor
 ### GET `/purchases`
 Lista todas as compras do cliente logado com detalhes dos tickets e eventos.
@@ -175,7 +202,7 @@ Lista todas as compras do cliente logado com detalhes dos tickets e eventos.
 
 **Erros:**
 - `403` - Usuário não é cliente ou perfil não encontrado
-- `401` - Token inválido ou ausente
+- `401` - Sessão inválida ou ausente (cookie ou Bearer)
 - `500` - Erro interno do servidor
 ## �🛠️ Scripts Disponíveis
 
@@ -187,7 +214,7 @@ npm start      # Executar versão compilada
 
 ## 📝 Convenções
 
-- **Autenticação**: JWT no header `Authorization: Bearer <token>`
+- **Autenticação**: JWT em cookie httpOnly após login; fallback opcional `Authorization: Bearer <token>` para ferramentas
 - **Senhas**: Criptografadas com bcrypt (10 rounds)
 - **Timestamps**: Armazenados como objetos Date
 
@@ -207,6 +234,10 @@ O projeto está configurado para debug com VS Code usando o Node.js 22+.
 1. Adicione breakpoints clicando na margem esquerda do editor
 2. Pressione `F5` para iniciar o debug
 3. Use Bruno ou qualquer cliente HTTP para testar os endpoints
+
+### Bruno e cookies
+
+Após **Login**, o servidor devolve `Set-Cookie`. No Bruno, mantenha o **jar de cookies** habilitado para as requisições seguintes herdarem a sessão (auth `inherit` na coleção). Alternativa: enviar manualmente `Authorization: Bearer <jwt>` em qualquer rota protegida.
 
 ## 🤝 Contribuindo
 

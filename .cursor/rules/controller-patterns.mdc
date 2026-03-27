@@ -23,9 +23,9 @@ Controllers recebem requisicoes HTTP, delegam para Services e retornam respostas
 
 ## Autenticacao
 
-- `req.user` populado pelo middleware JWT (campos: `id`, `name`, `email`, `role`)
+- `req.user` populado pelo middleware JWT (campos: `id`, `name`, `email`, `role`); o token vem do cookie httpOnly ou, opcionalmente, de `Authorization: Bearer`
 - Checagem de role feita no controller: `req.user.role === 'partner'`
-- Rotas publicas: login, registro de customer/partner, listagem de eventos
+- Rotas publicas: login, logout, registro de customer/partner, listagem de eventos
 
 ## Respostas padronizadas
 
