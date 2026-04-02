@@ -74,15 +74,12 @@ Este documento descreve todas as tecnologias, bibliotecas e ferramentas utilizad
 ### Docker
 - **Descrição**: Plataforma de containerização
 - **Por que usamos**: Ambiente consistente, facilidade de deploy
-- **Uso no projeto**: Container para o banco de dados MySQL
+- **Uso no projeto**: imagem da API (`Dockerfile`); ou só MySQL no container e API com `npm run dev` na máquina
 
 ### Docker Compose
 - **Descrição**: Ferramenta para definir e executar aplicações multi-container
 - **Por que usamos**: Orquestração simples de serviços
-- **Uso no projeto**:
-  - Definição do serviço MySQL
-  - Configuração de volumes e rede
-  - Script de inicialização do banco
+- **Uso no projeto**: serviços MySQL e API (`docker compose up --build`); `init.sql` na subida do banco; variáveis da API no compose
 
 ## Ferramentas de Desenvolvimento
 
